@@ -2848,7 +2848,7 @@ public class AdapterService extends Service {
     }
 
     boolean removeBond(BluetoothDevice device) {
-        enforceBluetoothPrivilegedPermission(this);
+        enforceBluetoothAdminPermission(this);
         DeviceProperties deviceProp = mRemoteDevices.getDeviceProperties(device);
         if (deviceProp == null || deviceProp.getBondState() != BluetoothDevice.BOND_BONDED) {
             return false;
@@ -4229,7 +4229,7 @@ public class AdapterService extends Service {
             final SoftApConfiguration config = mWifiManager.getSoftApConfiguration();
             if ((mWifiManager != null) && ((mWifiManager.isWifiEnabled() ||
                 ((mWifiManager.getWifiApState() == WifiManager.WIFI_AP_STATE_ENABLED) &&
-                (config.getBand() == SoftApConfiguration.BAND_5GHZ))))) {
+                ((config.getBand() & SoftApConfiguration.BAND_5GHZ) != 0))))) {
                 return true;
             }
             return false;
