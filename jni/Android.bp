@@ -29,7 +29,6 @@ cc_library_shared {
         "libbinder",
         "libbluetooth-binder",
         "libchrome",
-        "libnativehelper",
         "liblog",
         "libutils",
         "libbase",
