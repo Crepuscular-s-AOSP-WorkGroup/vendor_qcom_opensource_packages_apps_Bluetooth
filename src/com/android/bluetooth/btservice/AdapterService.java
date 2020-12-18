@@ -200,7 +200,7 @@ public class AdapterService extends Service {
 
     private static final int CONTROLLER_ENERGY_UPDATE_TIMEOUT_MILLIS = 30;
     private static final int DELAY_A2DP_SLEEP_MILLIS = 100;
-
+    private static final int TYPE_BREDR = 100;
     private final ArrayList<DiscoveringPackage> mDiscoveringPackages = new ArrayList<>();
 
     static {
@@ -566,7 +566,11 @@ public class AdapterService extends Service {
         mAdapterStateMachine =  AdapterState.make(this);
         mJniCallbacks = new JniCallbacks(this, mAdapterProperties);
         mVendorSocket = new VendorSocket(this);
-        initNative(isGuest(), isSingleUserMode());
+        int configCompareResult = 0;
+        // Android TV doesn't show consent dialogs for just works and encryption only le pairing
+        boolean isAtvDevice = getApplicationContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_LEANBACK_ONLY);
+        initNative(isGuest(), isSingleUserMode(), configCompareResult, isAtvDevice);
         mNativeAvailable = true;
         mCallbacks = new RemoteCallbackList<IBluetoothCallback>();
         mAppOps = getSystemService(AppOpsManager.class);
@@ -2374,6 +2378,9 @@ public class AdapterService extends Service {
 
             return service.startClockSync();
         }
+
+        @Override
+        public int getDeviceType(BluetoothDevice device) { return TYPE_BREDR; }
 
         @Override
         public void dump(FileDescriptor fd, String[] args) {
@@ -4244,7 +4251,8 @@ public class AdapterService extends Service {
 
     static native void classInitNative();
 
-    native boolean initNative(boolean startRestricted, boolean isSingleUserMode);
+    native boolean initNative(boolean startRestricted, boolean isSingleUserMode,
+                              int configCompareResult, boolean isAtvDevice);
 
     native void cleanupNative();
 
